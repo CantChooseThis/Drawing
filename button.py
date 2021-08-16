@@ -2,11 +2,15 @@ import pygame as pg
 
 
 class Button:
-    def __init__(self, center):  # center is a tuple
-        self.surface = pg.image.load("Button.png")
+    def __init__(self, center, image):  # center is a tuple
+        self.image = image
+        self.surface = pg.image.load(image+".png")
         self.rect = self.surface.get_rect(center=center)
         # self.state = False
 
+    def copy(self):
+        duplicate = Button((self.rect.x, self.rect.y+50), self.image)
+        return duplicate
 
     # def toggle(self):
     #     if self.state:
