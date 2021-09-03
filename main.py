@@ -1,20 +1,17 @@
 import pygame as pg
 from button import Button
 
-# Try and make a recursive pizza topping (pizza on pizza)
-
-# TODO add buttons to top
-# TODO add functionality to buttons
-# TODO create pizza surface
-
 WIDTH, HEIGHT = 500, 500
 WIN = pg.display.set_mode((WIDTH, HEIGHT))
 
 
-def draw(*args):
+def draw(*args, trash=None):
     WIN.fill((128, 128, 128))
+    Pizza = pg.transform.scale(pg.image.load("Pizza.png"), (400, 400))
+    WIN.blit(Pizza, (Pizza.get_rect(center=(250, 250))))
     for arg in args:
         WIN.blit(arg.surface, arg.rect)
+    WIN.blit(trash[0], trash[1])
     pg.display.update()
 
 
@@ -30,19 +27,30 @@ def main():
     toppings = []
     play = True
     printed = False
+    clicking = False
+    x = pg.image.load("X.png")
+    xrect = x.get_rect(bottomleft=(0, HEIGHT))
     while play:
         for e in pg.event.get():
             if e.type == pg.QUIT:
                 play = False
         if pg.mouse.get_pressed()[0]:
             for button in buttons:
-                if button.rect.collidepoint(pg.mouse.get_pos()):
+                if not clicking and button.rect.collidepoint(pg.mouse.get_pos()):
                     topping = button.copy()
                     toppings.append(topping)
 
-                    pg.mouse.set_pos(pg.mouse.get_pos()[0], pg.mouse.get_pos()[1]+50)
-
-        draw(*buttons, *toppings)
+                    # pg.mouse.set_pos(pg.mouse.get_pos()[0], pg.mouse.get_pos()[1]+50)
+            for topping in toppings:
+                if topping.rect.collidepoint(pg.mouse.get_pos()):
+                    topping.rect.center = pg.mouse.get_pos()
+            clicking = True
+        else:
+            for topping in toppings:
+                if topping.rect.colliderect(xrect):
+                    toppings.pop(toppings.index(topping))
+            clicking = False
+        draw(*buttons, *toppings, trash=(x, xrect))
         if pg.mouse.get_pressed()[2] and not printed:
             printed = True
             print([button.rect.center for button in buttons])
